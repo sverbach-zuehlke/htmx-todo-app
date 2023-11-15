@@ -1,0 +1,9 @@
+dialog(open, class="bg-pink-200 p-8 rounded-md shadow-xl -translate-y-1/2 -translate-x-1/2 w-96 p-12 box-content") 
+    ul(class="flex flex-col gap-2")
+      li Name: #{todo.name}
+      li Description: #{todo.description}
+      li Status: #{todo.done ? 'done' : 'open'}
+      li Created at: #{todo.createdAt.toLocaleString('en-US')}
+    form(method="dialog", class="pt-8")
+      button(class="bg-orange-200") Close
+      
