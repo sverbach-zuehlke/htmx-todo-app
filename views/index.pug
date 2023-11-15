@@ -3,13 +3,17 @@ html(lang='en')
     head
         meta(charset='utf-8')
         meta(name='viewport' content='width=device-width, initial-scale=1')
-        title Template • TodoMVC
-        link(rel='stylesheet' href='/css/todomvc-common/base.css')
-        link(rel='stylesheet' href='/css/todomvc-app-css/index.css')
-        // CSS overrides - remove if you don't need it
-        //-link(rel='stylesheet' href='css/app.css')
-    body
-        section.todoapp
-            header.header
-                h1 todos
+        title HTMX Todo App
+        script(src="https://cdn.tailwindcss.com")
         script(src='https://unpkg.com/htmx.org@1.9.8')
+
+    body(class='font-mono h-screen bg-gray-200 flex flex-col items-center justify-center')
+        section.todoapp(class='w-96 bg-white p-8 rounded-md shadow-xl')
+            header.header
+                h1(class='text-xl font-bold') todos
+
+            main.content(class='')
+                ul
+                    each todo in todos
+                        include components/todo-item
+

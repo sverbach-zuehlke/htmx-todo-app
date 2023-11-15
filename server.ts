@@ -5,9 +5,16 @@ import path from 'path';
 import {v4 as uuid} from 'uuid';
 
 const PORT = process.env.PORT || 3001;
-let todos = [
+
+type Todo = {
+    id: string,
+    name: string,
+    done: boolean
+}
+
+let todos: Todo[] = [
     {
-        id: uuid(),
+        id: "123",
         name: 'Taste htmx',
         done: true
     },
@@ -27,9 +34,15 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(path.join(__dirname, 'assets')));
 
 app.get('/', (req, res ) => {
-
     res.render('index', { todos });
 });
+
+app.delete('/todos/:id', (req,res) => {
+    const { id } = req.params;
+    todos = todos.filter(t => t.id !== id);
+    res.sendStatus(200);
+});
+
 
 app.listen(PORT);
 
