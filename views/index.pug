@@ -10,10 +10,12 @@ html(lang='en')
     body(class='font-mono h-screen bg-gray-200 flex flex-col items-center justify-center')
         section.todoapp(class='w-96 bg-white p-8 rounded-md shadow-xl')
             header.header
-                h1(class='text-xl font-bold') todos
+                h1(class='text-xl font-bold pb-4') todos
+
+            div(class='pb-4')
+                include components/add-todo
 
             main.content(class='')
-                ul
+                ul.todos
                     each todo in todos
                         include components/todo-item
-
