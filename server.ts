@@ -3,33 +3,9 @@ import pug from "pug";
 import bodyParser from "body-parser";
 import path from "path";
 import { v4 as uuid } from "uuid";
+import {Todo, db} from "./db/todos";
 
 const PORT = process.env.PORT || 3001;
-
-type Todo = {
-  id: string;
-  name: string;
-  description: string;
-  done: boolean;
-  createdAt: Date;
-};
-
-let todos: Todo[] = [
-  {
-    id: uuid(),
-    name: "Uninstall htmx",
-    description: "After trying out htmx I want to commit uninstall.",
-    done: true,
-    createdAt: new Date(new Date().getTime() - 24 * 3600 * 1000),
-  },
-  {
-    id: uuid(),
-    name: "setup neovim for 3 hrs",
-    description: "goal is to have neovim configured for my dotnet project",
-    done: false,
-    createdAt: new Date(),
-  },
-];
 
 const app = express();
 app.set("view engine", "pug");
@@ -40,16 +16,22 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "assets")));
 
 app.get("/", (req, res) => {
-  res.render("index", { todos });
+  res.redirect(`/${uuid()}`);
 });
 
-app.delete("/todos/:id", (req, res) => {
-  const { id } = req.params;
-  todos = todos.filter((t) => t.id !== id);
+app.get("/:listId", (req, res) => {
+  const {listId} = req.params;
+  res.render("index", { todoList: db.get(listId) });
+})
+
+app.delete("/:listId/todos/:id", (req, res) => {
+  const { listId, id } = req.params;
+  db.removeTodo(listId, id);
   res.sendStatus(200); // never, under ZERO circumstances, send 204, I dare you!
 });
 
-app.post("/todos", (req, res) => {
+app.post("/:listId/todos", (req, res) => {
+  const { listId } = req.params;
   const { name } = req.body;
   const todo: Todo = {
     id: uuid(),
@@ -58,27 +40,29 @@ app.post("/todos", (req, res) => {
     done: false,
     createdAt: new Date(),
   };
-  todos.push(todo);
+  const todoList = db.addTodo(listId, todo);
   const template = pug.compileFile("views/components/todo-item.pug");
-  const markup = template({ todo });
+  const markup = template({ todo, todoList });
   res.status(201).send(markup);
 });
 
-app.get("/todos/:id", (req, res) => {
-  const { id } = req.params;
-  const todo = todos.find((t) => t.id === id);
+app.get("/:listId/todos/:id", (req, res) => {
+  const { listId, id } = req.params;
+  const todoList = db.get(listId);
+  const todo = todoList.items.find(t => t.id === id);
   const template = pug.compileFile("views/components/todo-item-details.pug");
-  const markup = template({ todo });
+  const markup = template({ todo, todoList });
   res.status(200).send(markup);
 });
 
-app.post("/todos/:id/toggle", (req, res) => {
-  const { id } = req.params;
-  const todo = todos.find((t) => t.id === id)!;
+app.post("/:listId/todos/:id/toggle", (req, res) => {
+  const { listId, id } = req.params;
+  const todoList = db.get(listId);
+  const todo = todoList.items.find((t) => t.id === id)!;
   todo.done = !todo.done;
 
   const template = pug.compileFile("views/components/todo-item.pug");
-  const markup = template({ todo });
+  const markup = template({ todo, todoList });
   res.status(200).send(markup);
 });
 

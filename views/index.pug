@@ -8,16 +8,16 @@ html(lang='en')
         script(src='https://unpkg.com/htmx.org@1.9.8')
 
     body(class='font-mono h-screen bg-gray-200 flex flex-col items-center justify-center')
-        section.todoapp(class='w-96 bg-white p-8 rounded-md shadow-xl')
+        section.todoapp(class='w-auto max-w-full min-w-[400px] bg-white p-8 rounded-md shadow-xl')
             header.header
-                h1(class='text-xl font-bold pb-4') todos
+                h1(class='text-xl font-bold pb-4' title=todoList.id) todos ##{todoList.id.split('-')[0]}
 
             div(class='pb-4')
                 include components/add-todo
 
             main.content(class='')
                 ul.todos
-                    each todo in todos
+                    each todo in todoList.items
                         include components/todo-item
 
             div.dialog-root(class="fixed left-1/2 top-1/2")
